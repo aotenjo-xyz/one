@@ -1,6 +1,7 @@
 # Aotenjo One
 This is Aotenjo One board firmware repository. It controls a gimbal motor and communicates with the main controller via CAN bus.
 
+<img src="/.github/images/aotenjo-one-and-be4108.png" alt="Aotenjo One" width="500"/>
 
 Features
 - STM32G431CB (128KB Flash, 32KB RAM, 170MHz)

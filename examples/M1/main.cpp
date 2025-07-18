@@ -116,8 +116,8 @@ void configureFOC() {
   motor.PID_velocity.I = 20;
   motor.PID_velocity.D = 0.001;
   motor.voltage_limit = 3;
-  motor.LPF_velocity.Tf = 0.01f;
-  motor.P_angle.P = 20;
+  motor.LPF_velocity.Tf = 0.005f;
+  motor.P_angle.P = 25;
   motor.velocity_limit = 10;
 
   // initialize motor

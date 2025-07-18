@@ -25,7 +25,8 @@ int LED_PIN = PC4;
 
 void configureFOC();
 
-float targetAngle = 0;
+// control torque with voltage
+float targetVoltage = 0.0f;
 
 /**
  * @brief System Clock Configuration
@@ -71,16 +72,16 @@ void SystemClock_Config(void) {
 
 class RxFromCAN : public PingPongNotificationsFromCAN {
 public:
-  RxFromCAN() : MessageStatus(NONE), TargetAngle(0.0f){};
+  RxFromCAN() : MessageStatus(NONE), TargetVoltage(0.0f){};
 
   void SetMotorPosition(const uint8_t *data) {
-    TargetAngle = unpackAngleFromCanMessage(data);
-    Serial1.print("Target angle: ");
-    Serial1.print(TargetAngle);
-    MessageStatus = SET_POSITION;
+    TargetVoltage = unpackAngleFromCanMessage(data);
+    Serial1.print("Target voltage: ");
+    Serial1.print(TargetVoltage);
+    MessageStatus = SET_TARGET;
   };
 
-  void ReturnMotorPosition() { MessageStatus = REQUEST_POSITION; };
+  void ReturnMotorTarget() { MessageStatus = REQUEST_TARGET; };
 
   void EmergencyStop() {
     Serial1.println("Emergency stop");
@@ -92,7 +93,7 @@ public:
   };
 
   MESSAGE_STATUS MessageStatus;
-  float TargetAngle;
+  float TargetVoltage;
 };
 
 void configureFOC() {
@@ -110,15 +111,12 @@ void configureFOC() {
   driver.voltage_power_supply = 12;
   driver.init();
   motor.linkDriver(&driver);
-  motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
-  motor.controller = MotionControlType::angle;
-  motor.PID_velocity.P = 0.2;
-  motor.PID_velocity.I = 20;
-  motor.PID_velocity.D = 0.001;
+  // 14.0Ω / 2 = 7.0Ω
+  motor.phase_resistance = PHASE_RESISTANCE;
+  motor.torque_controller = TorqueControlType::voltage;
+  // set motion control loop to be used
+  motor.controller = MotionControlType::torque;
   motor.voltage_limit = 3;
-  motor.LPF_velocity.Tf = 0.01f;
-  motor.P_angle.P = 20;
-  motor.velocity_limit = 10;
 
   // initialize motor
   motor.init();
@@ -151,20 +149,20 @@ void setup() {
 
 void loop() {
   motor.loopFOC();
-  motor.move(targetAngle);
+  motor.move(targetVoltage);
 
   CAN_msg_t CAN_TX_msg;
 
   switch (CANBroker.MessageStatus) {
-  case SET_POSITION:
-    targetAngle = CANBroker.TargetAngle;
+  case SET_TARGET:
+    targetVoltage = CANBroker.TargetVoltage;
     // Reset the received ID to NONE.
     CANBroker.MessageStatus = NONE;
     break;
-  case REQUEST_POSITION:
-    // Send the motor position back to the sender.
-    CAN_TX_msg.id = ANGL_REQUEST_CMD;
-    packAngleIntoCanMessage(&CAN_TX_msg, motor.shaft_angle);
+  case REQUEST_TARGET:
+    // Send the voltage(torque) back to the sender.
+    CAN_TX_msg.id = TARGET_REQUEST_CMD;
+    packAngleIntoCanMessage(&CAN_TX_msg, targetVoltage);
     CANDevice.CANSendByte(CAN_TX_msg.data, CAN_TX_msg.id);
     // Reset the received ID to NONE.
     CANBroker.MessageStatus = NONE;

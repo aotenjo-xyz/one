@@ -1,31 +1,27 @@
-// clang-format off
-#include <Arduino.h>
-#include <math.h>
-#include "SimpleCAN.h"
-#include "CANProfile.h"
-#include "STM32CAN.h"
-#include "SPI.h"
 #include "SimpleFOC.h"
 #include "SimpleFOCDrivers.h"
+#include "SPI.h"
 #include "encoders/mt6701/MagneticSensorMT6701SSI.h"
-// clang-format on
+#include "Arduino.h"
 
 #define SENSOR1_CS PA4
 MagneticSensorMT6701SSI sensor1(SENSOR1_CS);
 
-HardwareSerial Serial1(PA3, PA2);
 
 BLDCMotor motor = BLDCMotor(11);
 BLDCDriver3PWM driver = BLDCDriver3PWM(PA8, PA9, PA10, PC6);
 
+HardwareSerial Serial1(PA3, PA2);
+
 int DRIVER_RESET = PB6;
 int DRIVER_SLEEP = PB5;
 int DRIVER_FAULT = PB4;
-int LED_PIN = PC4;
 
-void configureFOC();
+float target_angle = 0;
 
-float targetAngle = 0;
+// instantiate the commander
+Commander command = Commander(Serial1);
+void doTarget(char* cmd) { command.scalar(&target_angle, cmd); }
 
 /**
  * @brief System Clock Configuration
@@ -69,108 +65,77 @@ void SystemClock_Config(void) {
   }
 }
 
-class RxFromCAN : public PingPongNotificationsFromCAN {
-public:
-  RxFromCAN() : MessageStatus(NONE), TargetAngle(0.0f){};
-
-  void SetMotorPosition(const uint8_t *data) {
-    TargetAngle = unpackAngleFromCanMessage(data);
-    Serial1.print("Target angle: ");
-    Serial1.print(TargetAngle);
-    MessageStatus = SET_POSITION;
-  };
-
-  void ReturnMotorPosition() { MessageStatus = REQUEST_POSITION; };
-
-  void EmergencyStop() {
-    Serial1.println("Emergency stop");
-    digitalWrite(DRIVER_SLEEP, LOW);
-    digitalWrite(LED_PIN, HIGH);
-    while (true) {
-      delay(1000);
-    }
-  };
-
-  MESSAGE_STATUS MessageStatus;
-  float TargetAngle;
-};
-
-void configureFOC() {
+void setup() {
   pinMode(DRIVER_RESET, OUTPUT);
   digitalWrite(DRIVER_RESET, HIGH);
   pinMode(DRIVER_SLEEP, OUTPUT);
   digitalWrite(DRIVER_SLEEP, HIGH);
-  pinMode(DRIVER_FAULT, INPUT);
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  pinMode(DRIVER_FAULT, INPUT); 
 
+  Serial1.begin(115200);
   sensor1.init();
   motor.linkSensor(&sensor1);
 
+  // driver config
+  // power supply voltage [V]
   driver.voltage_power_supply = 12;
   driver.init();
+  // link driver
   motor.linkDriver(&driver);
+
+  // choose FOC modulation (optional)
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
+
+  // set motion control loop to be used
   motor.controller = MotionControlType::angle;
+
+  // velocity PI controller parameters
   motor.PID_velocity.P = 0.2;
   motor.PID_velocity.I = 20;
   motor.PID_velocity.D = 0.001;
-  motor.voltage_limit = 3;
+  // maximal voltage to be set to the motor
+  motor.voltage_limit = 3.0;
+
+  // velocity low pass filtering time constant
+  // the lower the less filtered
   motor.LPF_velocity.Tf = 0.01f;
+
+  // angle P controller
   motor.P_angle.P = 20;
+  // maximal velocity of the position control
   motor.velocity_limit = 10;
+  // motor.motion_downsample = 0.3;
+
+  motor.useMonitoring(Serial1);
 
   // initialize motor
   motor.init();
   // align sensor and start FOC
   motor.initFOC();
 
+  // add target command T
+  command.add('T', doTarget, "target angle");
+
   Serial1.println(F("Motor ready."));
+  Serial1.println(F("Set the target angle using serial terminal:"));
+
+  Serial1.println("Sensor ready");
   _delay(1000);
 }
 
-RxFromCAN CANBroker;
-
-CANPingPong CANDevice(CreateCanLib(PB9, PB8), &CANBroker);
-
-void setup() {
-  HAL_Init();
-  delay(100);
-
-  Serial1.begin(115200);
-
-  delay(1000);
-
-  configureFOC();
-  // while (!Serial);
-
-  CANDevice.Init();
-
-  CANDevice.Can1->EnableBlinkOnActivity(LED_PIN);
-}
-
 void loop() {
+  // main FOC algorithm function
   motor.loopFOC();
-  motor.move(targetAngle);
 
-  CAN_msg_t CAN_TX_msg;
+  // Motion control function
+  motor.move(target_angle);
 
-  switch (CANBroker.MessageStatus) {
-  case SET_POSITION:
-    targetAngle = CANBroker.TargetAngle;
-    // Reset the received ID to NONE.
-    CANBroker.MessageStatus = NONE;
-    break;
-  case REQUEST_POSITION:
-    // Send the motor position back to the sender.
-    CAN_TX_msg.id = ANGL_REQUEST_CMD;
-    packAngleIntoCanMessage(&CAN_TX_msg, motor.shaft_angle);
-    CANDevice.CANSendByte(CAN_TX_msg.data, CAN_TX_msg.id);
-    // Reset the received ID to NONE.
-    CANBroker.MessageStatus = NONE;
-    break;
+  motor.monitor();
+  // user communication
+  command.run();
+
+  if (digitalRead(DRIVER_FAULT) == LOW) {
+    Serial1.println("Driver fault");
+    delay(1000);
   }
-
-  // Update message queues.
-  CANDevice.Can1->Loop();
 }

@@ -12,18 +12,22 @@ typedef enum {
 } CAN_ID;
 
 // change these to match the motor control IDs
-#define ANGL_CNTL_CMD M0_ANGLE_CNTL
-#define ANGL_REQUEST_CMD M0_POS
+#define TARGET_CNTL_CMD M3_ANGLE_CNTL
+#define TARGET_REQUEST_CMD M3_POS
+
+// phase resistance of the motor = internal resistance / 2
+// 14.0Ω / 2 = 7.0Ω
+#define PHASE_RESISTANCE 7.0
 
 /* Symbolic names for ID of Motor                                            */
 typedef enum { MOTOR_0_ID = 0, MOTOR_1_ID, MOTOR_2_ID, MOTOR_3_ID } MOTOR_ID;
 
-typedef enum { SET_POSITION = 0, REQUEST_POSITION, NONE } MESSAGE_STATUS;
+typedef enum { SET_TARGET = 0, REQUEST_TARGET, NONE } MESSAGE_STATUS;
 
 class PingPongNotificationsFromCAN {
 public:
   virtual void SetMotorPosition(const uint8_t *data) = 0;
-  virtual void ReturnMotorPosition() = 0;
+  virtual void ReturnMotorTarget() = 0;
   virtual void EmergencyStop() = 0;
 };
 
@@ -41,11 +45,11 @@ public:
     // Serial1.println("@");
 
     switch (rxHeader.Identifier) {
-    case ANGL_CNTL_CMD:
+    case TARGET_CNTL_CMD:
       pRxCommands->SetMotorPosition(rxData);
       break;
-    case ANGL_REQUEST_CMD:
-      pRxCommands->ReturnMotorPosition();
+    case TARGET_REQUEST_CMD:
+      pRxCommands->ReturnMotorTarget();
       break;
     case ESTOP:
       Serial1.println("ESTOP");

@@ -12,8 +12,8 @@ typedef enum {
 } CAN_ID;
 
 // change these to match the motor control IDs
-#define ANGL_CNTL_CMD M0_ANGLE_CNTL
-#define ANGL_REQUEST_CMD M0_POS
+#define ANGL_CNTL_CMD M2_ANGLE_CNTL
+#define ANGL_REQUEST_CMD M2_POS
 
 /* Symbolic names for ID of Motor                                            */
 typedef enum { MOTOR_0_ID = 0, MOTOR_1_ID, MOTOR_2_ID, MOTOR_3_ID } MOTOR_ID;

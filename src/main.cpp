@@ -163,7 +163,7 @@ void loop() {
     break;
   case REQUEST_POSITION:
     // Send the motor position back to the sender.
-    CAN_TX_msg.id = M0_POS;
+    CAN_TX_msg.id = ANGL_REQUEST_CMD;
     packAngleIntoCanMessage(&CAN_TX_msg, motor.shaft_angle);
     CANDevice.CANSendByte(CAN_TX_msg.data, CAN_TX_msg.id);
     // Reset the received ID to NONE.

@@ -11,6 +11,10 @@ typedef enum {
   ESTOP
 } CAN_ID;
 
+// change these to match the motor control IDs
+#define ANGL_CNTL_CMD M0_ANGLE_CNTL
+#define ANGL_REQUEST_CMD M0_POS
+
 /* Symbolic names for ID of Motor                                            */
 typedef enum { MOTOR_0_ID = 0, MOTOR_1_ID, MOTOR_2_ID, MOTOR_3_ID } MOTOR_ID;
 
@@ -37,10 +41,10 @@ public:
     // Serial1.println("@");
 
     switch (rxHeader.Identifier) {
-    case M0_ANGLE_CNTL:
+    case ANGL_CNTL_CMD:
       pRxCommands->SetMotorPosition(rxData);
       break;
-    case M0_POS:
+    case ANGL_REQUEST_CMD:
       pRxCommands->ReturnMotorPosition();
       break;
     case ESTOP:

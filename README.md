@@ -1,6 +1,8 @@
 # Aotenjo One
 This is Aotenjo One board firmware repository. It controls a gimbal motor and communicates with the main controller via CAN bus.
 
+[Docs](https://aotenjo.xyz/docs/category/aotenjo-one) | [Shop](https://shop.aotenjo.xyz/products/aotenjo-one)
+
 <img src="/.github/images/aotenjo-one-and-be4108.png" alt="Aotenjo One" width="500"/>
 
 Features

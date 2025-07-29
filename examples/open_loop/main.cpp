@@ -1,7 +1,7 @@
-// ref. https://github.com/simplefoc/Arduino-FOC/blob/master/examples/motion_control/open_loop_motor_control/open_loop_velocity_example/open_loop_velocity_example.ino
+// ref.
+// https://github.com/simplefoc/Arduino-FOC/blob/master/examples/motion_control/open_loop_motor_control/open_loop_velocity_example/open_loop_velocity_example.ino
 // Open loop motor control example
 #include <SimpleFOC.h>
-
 
 // BLDC motor & driver instance
 // BLDCMotor motor = BLDCMotor(pole pair number);
@@ -10,7 +10,7 @@ BLDCDriver3PWM driver = BLDCDriver3PWM(PA8, PA9, PA10, PC6);
 
 HardwareSerial Serial1(PA3, PA2);
 
-//target variable
+// target variable
 float target_velocity = 0;
 
 int DRIVER_RESET = PB6;
@@ -19,8 +19,8 @@ int DRIVER_FAULT = PB4;
 
 // instantiate the commander
 Commander command = Commander(Serial1);
-void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
-void doLimit(char* cmd) { command.scalar(&motor.voltage_limit, cmd); }
+void doTarget(char *cmd) { command.scalar(&target_velocity, cmd); }
+void doLimit(char *cmd) { command.scalar(&motor.voltage_limit, cmd); }
 
 /**
  * @brief System Clock Configuration
@@ -69,7 +69,7 @@ void setup() {
   digitalWrite(DRIVER_RESET, HIGH);
   pinMode(DRIVER_SLEEP, OUTPUT);
   digitalWrite(DRIVER_SLEEP, HIGH);
-  pinMode(DRIVER_FAULT, INPUT); 
+  pinMode(DRIVER_FAULT, INPUT);
 
   // driver config
   // power supply voltage [V]
@@ -86,8 +86,8 @@ void setup() {
   // limit the voltage to be set to the motor
   // start very low for high resistance motors
   // current = voltage / resistance, so try to be well under 1Amp
-  motor.voltage_limit = 3.0;   // [V]
- 
+  motor.voltage_limit = 3.0; // [V]
+
   // open loop control config
   motor.controller = MotionControlType::velocity_openloop;
 

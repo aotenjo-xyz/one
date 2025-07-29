@@ -1,5 +1,5 @@
 # M1
-M1 motor changes the stator angle.
+M1 motor changes the stator angle and keeps the stator position.
 
 Changes
 - Decrease `LPF_velocity.Tf` value to react faster to changes in velocity.

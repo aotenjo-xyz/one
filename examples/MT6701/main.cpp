@@ -1,8 +1,8 @@
+#include "Arduino.h"
+#include "SPI.h"
 #include "SimpleFOC.h"
 #include "SimpleFOCDrivers.h"
-#include "SPI.h"
 #include "encoders/mt6701/MagneticSensorMT6701SSI.h"
-#include "Arduino.h"
 
 #define SENSOR1_CS PA4
 MagneticSensorMT6701SSI sensor1(SENSOR1_CS);
@@ -62,10 +62,10 @@ void setup() {
 void loop() {
   // iterative function updating the sensor internal variables
   // it is usually called in motor.loopFOC()
-  // this function reads the sensor hardware and 
+  // this function reads the sensor hardware and
   // has to be called before getAngle nad getVelocity
   sensor1.update();
-  
+
   // display the angle and the angular velocity to the terminal
   Serial1.print(sensor1.getAngle());
   Serial1.print("\t");

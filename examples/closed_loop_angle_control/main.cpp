@@ -1,12 +1,11 @@
+#include "Arduino.h"
+#include "SPI.h"
 #include "SimpleFOC.h"
 #include "SimpleFOCDrivers.h"
-#include "SPI.h"
 #include "encoders/mt6701/MagneticSensorMT6701SSI.h"
-#include "Arduino.h"
 
 #define SENSOR1_CS PA4
 MagneticSensorMT6701SSI sensor1(SENSOR1_CS);
-
 
 BLDCMotor motor = BLDCMotor(11);
 BLDCDriver3PWM driver = BLDCDriver3PWM(PA8, PA9, PA10, PC6);
@@ -21,7 +20,7 @@ float target_angle = 0;
 
 // instantiate the commander
 Commander command = Commander(Serial1);
-void doTarget(char* cmd) { command.scalar(&target_angle, cmd); }
+void doTarget(char *cmd) { command.scalar(&target_angle, cmd); }
 
 /**
  * @brief System Clock Configuration
@@ -70,7 +69,7 @@ void setup() {
   digitalWrite(DRIVER_RESET, HIGH);
   pinMode(DRIVER_SLEEP, OUTPUT);
   digitalWrite(DRIVER_SLEEP, HIGH);
-  pinMode(DRIVER_FAULT, INPUT); 
+  pinMode(DRIVER_FAULT, INPUT);
 
   Serial1.begin(115200);
   sensor1.init();

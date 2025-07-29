@@ -1,6 +1,6 @@
 # Makefile
 
-SRC_FILES := $(wildcard src/*.cpp src/*.h include/*.h lib/**/*.cpp lib/**/*.h)
+SRC_FILES := $(wildcard src/*.cpp src/*.h include/*.h lib/**/*.cpp lib/**/*.h examples/**/*.cpp examples/**/*.h)
 
 format:
 	clang-format -i $(SRC_FILES)

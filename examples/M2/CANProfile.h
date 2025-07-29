@@ -1,22 +1,9 @@
-/* Symbolic names for ID of CAN message                                      */
-typedef enum {
-  M0_ANGLE_CNTL = 0x20,
-  M1_ANGLE_CNTL,
-  M2_ANGLE_CNTL,
-  M3_ANGLE_CNTL,
-  M0_POS,
-  M1_POS,
-  M2_POS,
-  M3_POS,
-  ESTOP
-} CAN_ID;
-
-// change these to match the motor control IDs
-#define ANGL_CNTL_CMD M2_ANGLE_CNTL
-#define ANGL_REQUEST_CMD M2_POS
-
-/* Symbolic names for ID of Motor                                            */
-typedef enum { MOTOR_0_ID = 0, MOTOR_1_ID, MOTOR_2_ID, MOTOR_3_ID } MOTOR_ID;
+#define ANGLE_COMMAND_OFFSET 0x20
+#define POS_COMMAND_OFFSET 0x30
+#define ESTOP 0xff
+#define MOTOR_ID 0x02 // M2
+#define ANGL_CNTL_CMD (MOTOR_ID + ANGLE_COMMAND_OFFSET)
+#define ANGL_REQUEST_CMD (MOTOR_ID + POS_COMMAND_OFFSET)
 
 typedef enum { SET_POSITION = 0, REQUEST_POSITION, NONE } MESSAGE_STATUS;
 

@@ -76,7 +76,7 @@ public:
   void SetMotorPosition(const uint8_t *data) {
     TargetAngle = unpackAngleFromCanMessage(data);
     Serial1.print("Target angle: ");
-    Serial1.print(TargetAngle);
+    Serial1.println(TargetAngle);
     MessageStatus = SET_POSITION;
   };
 

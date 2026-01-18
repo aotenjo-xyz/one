@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <assert.h>
 
-
 typedef enum {
   ANG_CONTROL = 0,
   REQ_DATA,

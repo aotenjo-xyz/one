@@ -15,6 +15,7 @@ Features
 - 8-35V input voltage
 - 14-bit magnetic encoder
 - Emergency stop command
+- CAN FD support
 
 
 ## Install
@@ -24,28 +25,11 @@ Install this repo
 git clone https://github.com/aotenjo-xyz/one.git 
 ```
 
-Install dependencies (SimpleCanLib)
-```bash
-mkdir Libraries
-cd Libraries
-git clone https://github.com/yuichiroaoki/SimpleCanLib.git
-git checkout CANSendByte-Serial1
-```
+## Compatibility
+This firmware is compatible with Aotenjo One v2.0 and later.
 
-
-Directory structure
-```bash
-├── Libraries
-│   └── SimpleCanLib
-└── one
-    ├── include
-    ├── lib
-    ├── LICENSE
-    ├── platformio.ini
-    ├── README.md
-    ├── src
-    └── test
-```
+> [!WARNING]
+> This firmware is not compatible with Aotenjo One v1.x.
 
 ### Development
 

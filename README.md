@@ -1,21 +1,21 @@
 # Aotenjo One
-This is Aotenjo One board firmware repository. It controls a gimbal motor and communicates with the main controller via CAN bus.
+This is Aotenjo One board firmware repository. It controls a gimbal motor and communicates with the main controller with the FDCAN protocol.
 
-[Docs](https://aotenjo.xyz/docs/category/aotenjo-one) | [Shop](https://shop.aotenjo.xyz/products/aotenjo-one)
+[Docs](https://aotenjo.xyz/docs/category/aotenjo-one) | [Shop](https://shop.aotenjo.xyz/products/aotenjo-one-v2-0)
 
 <img src="/.github/images/aotenjo-one-and-be4108.png" alt="Aotenjo One" width="500"/>
 
 Features
 - STM32G431CB (128KB Flash, 32KB RAM, 170MHz)
 - Closed loop FOC control
-- CAN (up to 1Mbps)
+- FDCAN (CAN with Flexible Data-Rate)
 - I2C, UART, SPI
 - based on DRV8313
 - 2.5A peak current
 - 8-35V input voltage
 - 14-bit magnetic encoder
 - Emergency stop command
-- CAN FD support
+- VCC voltage sensing
 
 
 ## Install
@@ -30,6 +30,10 @@ This firmware is compatible with Aotenjo One v2.0 and later.
 
 > [!WARNING]
 > This firmware is not compatible with Aotenjo One v1.x.
+
+If any board in the CAN network is an Aotenjo One v1.x or Aotenjo Master v1.x, **all boards must run the v1.x firmware** for compatibility.
+
+In this case, even v2.x boards must be flashed with the v1.x firmware.
 
 ### Development
 

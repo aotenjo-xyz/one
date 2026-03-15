@@ -1,16 +1,16 @@
 #include "STM32CAN.h"
 
-// Function to pack float angle into CAN message
-void packAngleIntoCanMessage(uint8_t *message, float angle) {
+// Function to pack float value into CAN message
+void packFloatIntoCanMessage(uint8_t *message, float value) {
   // Convert float to byte array using memcpy (be mindful of endianness)
-  memcpy(message, &angle, sizeof(float));
+  memcpy(message, &value, sizeof(float));
 }
 
-// Function to unpack float angle from CAN message
-float unpackAngleFromCanMessage(const uint8_t *data) {
-  float angle;
-  memcpy(&angle, data, sizeof(float));
-  return angle;
+// Function to unpack float value from CAN message
+float unpackFloatFromCanMessage(const uint8_t *data) {
+  float value;
+  memcpy(&value, data, sizeof(float));
+  return value;
 }
 
 /**

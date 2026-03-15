@@ -6,6 +6,7 @@
 #include "SPI.h"
 #include "SimpleFOC.h"
 #include "SimpleFOCDrivers.h"
+#include "VSENSE.h"
 #include "encoders/mt6701/MagneticSensorMT6701SSI.h"
 // clang-format on
 
@@ -218,16 +219,24 @@ void CANFD_CheckReceived(void) {
     if (dataLength <= 8) {
       switch (rxHeader.Identifier) {
       case ANGL_CNTL_CMD:
-        targetAngle = unpackAngleFromCanMessage(rxData);
+        targetAngle = unpackFloatFromCanMessage(rxData);
         Serial1.print("Target angle set to: ");
         Serial1.println(targetAngle);
         break;
       case ANGL_REQUEST_CMD:
         Serial1.print("Current motor angle: ");
         Serial1.println(motor.shaft_angle);
-        packAngleIntoCanMessage(txData, motor.shaft_angle);
+        packFloatIntoCanMessage(txData, motor.shaft_angle);
         CANFD_SendMessage(ANGL_REQUEST_CMD, txData, 4);
         break;
+      case VSENSE_CMD: {
+        Serial1.print("Current motor voltage: ");
+        float vccVoltage = readVoltage();
+        Serial1.println(vccVoltage);
+        packFloatIntoCanMessage(txData, vccVoltage);
+        CANFD_SendMessage(VSENSE_CMD, txData, 4);
+        break;
+      }
       case ESTOP:
         Serial1.println("ESTOP");
         EmergencyStop();
@@ -298,6 +307,22 @@ void setup() {
 
   configureFOC();
   // while (!Serial);
+
+  // --- START VREFBUF CONFIGURATION ---
+  // 1. Configure VREFBUF for 2.9V (Scale 2)
+  HAL_SYSCFG_VREFBUF_VoltageScalingConfig(SYSCFG_VREFBUF_VOLTAGE_SCALE2);
+
+  // Configure high impedance mode to disable (output onto VREF+ pin)
+  HAL_SYSCFG_VREFBUF_HighImpedanceConfig(SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE);
+
+  // Enable the Internal Voltage Reference buffer
+  HAL_SYSCFG_EnableVREFBUF();
+  // --- END VREFBUF CONFIGURATION ---
+
+  analogReadResolution(12);
+
+  delay(1000);
+  Serial.println("Start!");
 }
 
 void loop() {

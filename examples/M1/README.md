@@ -5,4 +5,6 @@ Changes
 - Decrease `LPF_velocity.Tf` value to react faster to changes in velocity.
 - Increase `P_angle.P` value to improve position control responsiveness.
 
-For eaglepower motors, you don't need to change these values. If you do, the motor may vibrate.
+> [!TIP]
+> For large stators (OD > 81mm), you may need to decrease `P_angle.P` value to prevent overshooting. 
+(e.g., `P_angle.P = 5` for OD = 83mm)

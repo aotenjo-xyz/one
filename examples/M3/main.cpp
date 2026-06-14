@@ -219,16 +219,16 @@ void CANFD_CheckReceived(void) {
 
     if (dataLength <= 8) {
       switch (rxHeader.Identifier) {
-      case TARGET_CNTL_CMD_OFFSET:
+      case TARGET_CNTL_CMD:
         targetVoltage = unpackFloatFromCanMessage(rxData);
         Serial1.print("Target voltage set to: ");
         Serial1.println(targetVoltage);
         break;
-      case TARGET_REQUEST_CMD_OFFSET:
+      case TARGET_REQUEST_CMD:
         Serial1.print("Current target voltage: ");
         Serial1.println(targetVoltage);
         packFloatIntoCanMessage(txData, targetVoltage);
-        CANFD_SendMessage(TARGET_REQUEST_CMD_OFFSET, txData, 4);
+        CANFD_SendMessage(TARGET_REQUEST_CMD, txData, 4);
         break;
       case VSENSE_CMD: {
         Serial1.print("Current motor voltage: ");

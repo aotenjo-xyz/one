@@ -328,13 +328,13 @@ void configureFOC() {
   sensor1.init();
   motor.linkSensor(&sensor1);
 
-  driver.voltage_power_supply = 12;
+  driver.voltage_power_supply = 24;
   driver.init();
   motor.linkDriver(&driver);
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
   motor.controller = MotionControlType::angle;
 
-  float defaultPIDConfig[7] = {0.2f, 20.0f, 0.001f, 20.0f, 3.0f, 10.0f,
+  float defaultPIDConfig[7] = {0.2f, 20.0f, 0.001f, 20.0f, 6.0f, 10.0f,
                               0.01f};
   applyPIDConfig(defaultPIDConfig, 7);
 

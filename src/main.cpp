@@ -31,8 +31,40 @@ int DRIVER_FAULT = PB4;
 int LED_PIN = PC4;
 
 void configureFOC();
+HAL_StatusTypeDef CANFD_SendMessage(uint32_t id, uint8_t *data,
+                                    uint8_t length);
 
 float targetAngle = 0;
+
+void applyPIDConfig(const float *config, uint8_t count) {
+  if (count >= 3) {
+    motor.PID_velocity.P = config[0];
+    motor.PID_velocity.I = config[1];
+    motor.PID_velocity.D = config[2];
+  }
+  if (count >= 4) {
+    motor.P_angle.P = config[3];
+  }
+  if (count >= 5) {
+    motor.voltage_limit = config[4];
+  }
+  if (count >= 6) {
+    motor.velocity_limit = config[5];
+  }
+  if (count >= 7) {
+    motor.LPF_velocity.Tf = config[6];
+  }
+}
+
+void sendPIDConfig(uint32_t cmdId) {
+  float config[7] = {motor.PID_velocity.P, motor.PID_velocity.I,
+                     motor.PID_velocity.D, motor.P_angle.P,
+                     motor.voltage_limit,   motor.velocity_limit,
+                     motor.LPF_velocity.Tf};
+
+  memcpy(txData, config, sizeof(config));
+  CANFD_SendMessage(cmdId, txData, sizeof(config));
+}
 
 /**
  * @brief System Clock Configuration
@@ -216,7 +248,7 @@ void CANFD_CheckReceived(void) {
     }
     Serial1.println();
 
-    if (dataLength <= 8) {
+    if (dataLength <= 8 || dataLength == 16 || dataLength == 32) {
       switch (rxHeader.Identifier) {
       case ANGL_CNTL_CMD:
         targetAngle = unpackFloatFromCanMessage(rxData);
@@ -237,6 +269,37 @@ void CANFD_CheckReceived(void) {
         CANFD_SendMessage(VSENSE_CMD, txData, 4);
         break;
       }
+      case PID_CONFIG_CMD: {
+        uint8_t floatCount = dataLength / sizeof(float);
+        if (floatCount == 4 || floatCount == 8) {
+          float config[7] = {0};
+          memcpy(config, rxData, dataLength);
+          applyPIDConfig(config, floatCount);
+
+          Serial1.print("PID config updated: P=");
+          Serial1.print(motor.PID_velocity.P);
+          Serial1.print(" I=");
+          Serial1.print(motor.PID_velocity.I);
+          Serial1.print(" D=");
+          Serial1.print(motor.PID_velocity.D);
+          Serial1.print(" angleP=");
+          Serial1.print(motor.P_angle.P);
+          Serial1.print(" voltageLimit=");
+          Serial1.print(motor.voltage_limit);
+          Serial1.print(" velocityLimit=");
+          Serial1.print(motor.velocity_limit);
+          Serial1.print(" tf=");
+          Serial1.println(motor.LPF_velocity.Tf);
+        } else {
+          Serial1.print("Invalid PID config size: ");
+          Serial1.print(dataLength);
+          Serial1.println(" bytes");
+        }
+        break;
+      }
+      case PID_CONFIG_REQUEST_CMD:
+        sendPIDConfig(PID_CONFIG_REQUEST_CMD);
+        break;
       case ESTOP:
         Serial1.println("ESTOP");
         EmergencyStop();
@@ -270,13 +333,10 @@ void configureFOC() {
   motor.linkDriver(&driver);
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
   motor.controller = MotionControlType::angle;
-  motor.PID_velocity.P = 0.2;
-  motor.PID_velocity.I = 20;
-  motor.PID_velocity.D = 0.001;
-  motor.voltage_limit = 3;
-  motor.LPF_velocity.Tf = 0.01f;
-  motor.P_angle.P = 20;
-  motor.velocity_limit = 10;
+
+  float defaultPIDConfig[7] = {0.2f, 20.0f, 0.001f, 20.0f, 3.0f, 10.0f,
+                              0.01f};
+  applyPIDConfig(defaultPIDConfig, 7);
 
   // initialize motor
   motor.init();

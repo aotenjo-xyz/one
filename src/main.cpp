@@ -31,8 +31,7 @@ int DRIVER_FAULT = PB4;
 int LED_PIN = PC4;
 
 void configureFOC();
-HAL_StatusTypeDef CANFD_SendMessage(uint32_t id, uint8_t *data,
-                                    uint8_t length);
+HAL_StatusTypeDef CANFD_SendMessage(uint32_t id, uint8_t *data, uint8_t length);
 
 float targetAngle = 0;
 
@@ -59,7 +58,7 @@ void applyPIDConfig(const float *config, uint8_t count) {
 void sendPIDConfig(uint32_t cmdId) {
   float config[7] = {motor.PID_velocity.P, motor.PID_velocity.I,
                      motor.PID_velocity.D, motor.P_angle.P,
-                     motor.voltage_limit,   motor.velocity_limit,
+                     motor.voltage_limit,  motor.velocity_limit,
                      motor.LPF_velocity.Tf};
 
   memcpy(txData, config, sizeof(config));
@@ -334,8 +333,7 @@ void configureFOC() {
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
   motor.controller = MotionControlType::angle;
 
-  float defaultPIDConfig[7] = {0.2f, 20.0f, 0.001f, 20.0f, 6.0f, 10.0f,
-                              0.01f};
+  float defaultPIDConfig[7] = {0.2f, 20.0f, 0.001f, 20.0f, 6.0f, 10.0f, 0.01f};
   applyPIDConfig(defaultPIDConfig, 7);
 
   // initialize motor

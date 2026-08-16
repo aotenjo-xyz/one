@@ -217,7 +217,7 @@ void CANFD_CheckReceived(void) {
     }
     Serial1.println();
 
-    if (dataLength <= 8) {
+    if (dataLength <= 8 || dataLength == 16 || dataLength == 32) {
       switch (rxHeader.Identifier) {
       case TARGET_CNTL_CMD:
         targetVoltage = unpackFloatFromCanMessage(rxData);
@@ -266,7 +266,7 @@ void configureFOC() {
   sensor1.init();
   motor.linkSensor(&sensor1);
 
-  driver.voltage_power_supply = 12;
+  driver.voltage_power_supply = 24;
   driver.init();
   motor.linkDriver(&driver);
   // 14.0Ω / 2 = 7.0Ω
@@ -274,7 +274,7 @@ void configureFOC() {
   motor.torque_controller = TorqueControlType::voltage;
   // set motion control loop to be used
   motor.controller = MotionControlType::torque;
-  motor.voltage_limit = 3;
+  motor.voltage_limit = VOLTAGE_LIMIT;
 
   // initialize motor
   motor.init();
@@ -320,7 +320,7 @@ void setup() {
   analogReadResolution(12);
 
   delay(1000);
-  Serial.println("Start!");
+  Serial1.println("Start!");
 }
 
 void loop() {

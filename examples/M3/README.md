@@ -14,11 +14,11 @@ Changes
 
 > [!WARNING]
 > You can increase the `VOLTAGE_LIMIT` value in `src/CANProfile.h` to allow for higher voltage output, but be cautious as this may lead to overcurrent conditions. 
-You may increase this value to allow higher torque output, but be aware:
-- Higher voltage → higher phase current
-- Higher current → risk of overheating or exceeding DRV8313’s 2.5 A limit
-- Incorrect values may damage the driver or power supply
-The default value is set to 3.0V, which is a safe limit for most applications. For detailed guidance, see:
-
-
-[Configuration and Torque Limits - SimpleFOC documentation](https://docs.simplefoc.com/voltage_torque_mode#configuration-and-torque-limits).
+> You may increase this value to allow higher torque output, but be aware:
+> - Higher voltage → higher phase current
+> - Higher current → risk of overheating or exceeding DRV8313’s 2.5 A limit
+> - Incorrect values may damage the driver or power supply
+> 
+> The default value is set to 3.0V, which is a safe limit for most applications. For detailed guidance, see:
+> 
+> [Configuration and Torque Limits - SimpleFOC documentation](https://docs.simplefoc.com/voltage_torque_mode#configuration-and-torque-limits).

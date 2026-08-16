@@ -1,10 +1,10 @@
+#define MOTOR_ID 0x00 // change this to your motor ID
 #define ANGLE_COMMAND_OFFSET 0x20
 #define POS_COMMAND_OFFSET 0x30
 #define VSENSE_CMD_OFFSET 0x40
 #define PID_CONFIG_CMD_OFFSET 0x50
 #define PID_CONFIG_REQUEST_CMD_OFFSET 0x60
 #define ESTOP 0xff
-#define MOTOR_ID 0x00 // change this to your motor ID
 #define ANGL_CNTL_CMD (MOTOR_ID + ANGLE_COMMAND_OFFSET)
 #define ANGL_REQUEST_CMD (MOTOR_ID + POS_COMMAND_OFFSET)
 #define VSENSE_CMD (MOTOR_ID + VSENSE_CMD_OFFSET)

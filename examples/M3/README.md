@@ -19,6 +19,6 @@ Changes
 > - Higher current → risk of overheating or exceeding DRV8313’s 2.5 A limit
 > - Incorrect values may damage the driver or power supply
 > 
-> The default value is set to 3.0V, which is a safe limit for most applications. For detailed guidance, see:
+> The default value is set to 8.0V, which is a safe limit for most applications. For detailed guidance, see:
 > 
 > [Configuration and Torque Limits - SimpleFOC documentation](https://docs.simplefoc.com/voltage_torque_mode#configuration-and-torque-limits).

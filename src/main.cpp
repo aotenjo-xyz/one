@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include "CANProfile.h"
+#include "MotorConfig.h"
 #include "STM32CAN.h"
 #include "SPI.h"
 #include "SimpleFOC.h"
@@ -45,7 +46,8 @@ void applyPIDConfig(const float *config, uint8_t count) {
     motor.P_angle.P = config[3];
   }
   if (count >= 5) {
-    float voltageLimit = constrain(config[4], 0.0f, driver.voltage_power_supply);
+    float voltageLimit =
+        constrain(config[4], 0.0f, driver.voltage_power_supply);
     motor.updateVoltageLimit(voltageLimit);
   }
   if (count >= 6) {
@@ -328,13 +330,14 @@ void configureFOC() {
   sensor1.init();
   motor.linkSensor(&sensor1);
 
-  driver.voltage_power_supply = 24;
+  driver.voltage_power_supply = VOLTAGE_POWER_SUPPLY;
   driver.init();
   motor.linkDriver(&driver);
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
   motor.controller = MotionControlType::angle;
 
-  float defaultPIDConfig[7] = {0.2f, 20.0f, 0.001f, 20.0f, 6.0f, 10.0f, 0.01f};
+  float defaultPIDConfig[7] = {
+      0.2f, 20.0f, 0.001f, 20.0f, DEFAULT_VOLTAGE_LIMIT, 10.0f, 0.01f};
   applyPIDConfig(defaultPIDConfig, 7);
 
   // initialize motor

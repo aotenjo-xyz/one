@@ -1,3 +1,5 @@
+#pragma once
+
 #define MOTOR_ID 0x00 // change this to your motor ID
 #define ANGLE_COMMAND_OFFSET 0x20
 #define POS_COMMAND_OFFSET 0x30

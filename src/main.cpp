@@ -45,10 +45,11 @@ void applyPIDConfig(const float *config, uint8_t count) {
     motor.P_angle.P = config[3];
   }
   if (count >= 5) {
-    motor.voltage_limit = config[4];
+    float voltageLimit = constrain(config[4], 0.0f, driver.voltage_power_supply);
+    motor.updateVoltageLimit(voltageLimit);
   }
   if (count >= 6) {
-    motor.velocity_limit = config[5];
+    motor.updateVelocityLimit(config[5]);
   }
   if (count >= 7) {
     motor.LPF_velocity.Tf = config[6];
